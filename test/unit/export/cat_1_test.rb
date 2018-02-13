@@ -32,148 +32,19 @@ class Cat1Test < Minitest::Test
     end
   end
 
-
-  def test_schema_validation
-     xsd = Nokogiri::XML::Schema(open("./resources/schema/infrastructure/cda/CDA_SDTC.xsd"))
-     valid_measures = @measures.select { |m| m.hqmf_id.length > 4 } #make sure there is a valid hqmf_id
-     Record.all.each do |record|
-      insurance_provider = InsuranceProvider.new(start_time: Time.new(2008,1,1).to_i,
-                                                 codes: {"SOP" => [349]})
-      record.insurance_providers << insurance_provider
-      puts "Testing Cat I for #{record.first} #{record.last}"
-      doc = Nokogiri::XML(HealthDataStandards::Export::Cat1.new("r3").export(record,valid_measures,@start_date,@end_date, @header, "r3"))
-      assert_equal [], xsd.validate(doc), "Invalid Cat I for #{record.first} #{record.last}"
-    end
-  end
-
-  def test_schematron_validation_qrda_r3
-    Record.all.each do |record|
-      insurance_provider = InsuranceProvider.new(start_time: Time.new(2008,1,1).to_i,
-						 codes: {"SOP" => [349]})
-      record.insurance_providers << insurance_provider
-      puts "Testing Cat I for #{record.first} #{record.last}"
-      doc = Nokogiri::XML(HealthDataStandards::Export::Cat1.new("r3").export(record,@measures,@start_date,@end_date, @header, "r3"))
-      errors = HealthDataStandards::Validate::Cat1.instance.validate(doc, {file_name: "cat1_good.xml"})
-
-      doc2 = Nokogiri::XML(HealthDataStandards::Export::Cat1.new("r3").export(record,@measures,@start_date,@end_date, nil, "r3"))
-      errors2 = HealthDataStandards::Validate::Cat1.instance.validate(doc, {file_name: "cat1_good.xml"})
-
-      assert_equal [], errors, "Invalid Cat I for #{record.first} #{record.last} (with header)"
-      assert_equal [], errors2, "Invalid Cat I for #{record.first} #{record.last} (w/o header)"
-
-    end
-  end
-
-  def test_schematron_validation_qrda_r4
-    # Patients with retired 'data criteria' (e.g., Diagnosis, Active) will fail export with QRDA Cat I R4.
-    Record.where(last: "QRDAR4").each do |record|
-      puts "Testing Cat I for #{record.first} #{record.last}"
-      doc = Nokogiri::XML(HealthDataStandards::Export::Cat1.new("r4").export(record,@measures,Time.at(1420070400),Time.at(1451606399), @header, "r4"))
-      errors = HealthDataStandards::Validate::Cat1R4.instance.validate(doc, {file_name: "cat1_good.xml"})
-
-      doc2 = Nokogiri::XML(HealthDataStandards::Export::Cat1.new("r4").export(record,@measures,@start_date,@end_date, nil, "r4"))
-      errors2 = HealthDataStandards::Validate::Cat1R4.instance.validate(doc, {file_name: "cat1_good.xml"})
-
-      assert_equal [], errors, "Invalid Cat I for #{record.first} #{record.last} (with header)"
-      assert_equal [], errors2, "Invalid Cat I for #{record.first} #{record.last} (w/o header)"
-
-    end
-  end
-
-  def test_schematron_r2_validation
-    Record.all.each do |record|
-      insurance_provider = InsuranceProvider.new(start_time: Time.new(2008,1,1).to_i,
-             codes: {"SOP" => [349]})
-      record.insurance_providers << insurance_provider
-      puts "Testing Cat I for #{record.first} #{record.last}"
-      doc = Nokogiri::XML(HealthDataStandards::Export::Cat1R2.new.export(record,@measures,@start_date,@end_date, @header))
-      errors = HealthDataStandards::Validate::Cat1R2.instance.validate(doc, {file_name: "cat1_good.xml"})
-
-      doc2 = Nokogiri::XML(HealthDataStandards::Export::Cat1R2.new.export(record,@measures,@start_date,@end_date, nil))
-      errors2 = HealthDataStandards::Validate::Cat1R2.instance.validate(doc, {file_name: "cat1_good.xml"})
-
-      assert_equal [], errors, "Invalid Cat I for #{record.first} #{record.last} (with header)"
-      assert_equal [], errors2, "Invalid Cat I for #{record.first} #{record.last} (w/o header)"
-
-    end
-  end
-
-  def test_cda_header_export
-    first_name = @doc.at_xpath('/cda:ClinicalDocument/cda:recordTarget/cda:patientRole/cda:patient/cda:name/cda:given').text
-    medical_record_assigner = @doc.at_xpath('/cda:ClinicalDocument/cda:recordTarget/cda:patientRole/cda:id/@root').value
-    author_root_value = @doc.at_xpath('/cda:ClinicalDocument/cda:author/cda:assignedAuthor/cda:id/@root').value
-    assert_equal 'Barry', first_name
-    assert_equal 'BarryBerrysBasement', medical_record_assigner
-    assert_equal '2.16.840.1.113883.4.7', author_root_value
-  end
-
-  def test_patient_data_section_export
-    med_dispensed = @doc.at_xpath('//cda:supply[cda:templateId/@root="2.16.840.1.113883.10.20.24.3.45"]')
-    assert med_dispensed, "med_dispensed is nil"
-    assert_equal "Multivitamin", med_dispensed.at_xpath('./cda:text').text
-  end
-
   def test_entries_for_data_criteria
     # for some reason the find method isn't working on @measures
     measure1 = @measures.select{|m| m.hqmf_id == '0001'}.first
     assert measure1
     data_criteria = measure1.all_data_criteria.find{|dc| dc.id == 'MedicationDispensedPreferredAsthmaTherapy_precondition_37'}
+    puts "-------------"
+    puts data_criteria.inspect
+    puts "-------------"
     entries = entries_for_data_criteria(data_criteria, @patient)
     assert_equal 1, entries.length
+    puts entries.inspect
+    puts "-------------"
     assert_equal 'Multivitamin', entries[0].description
-  end
-
-  def test_payer_information
-    data_criteria = OpenStruct.new(definition: "patient_characteristic_payer",
-                                   status: "",
-                                   negation: false)
-    entries = entries_for_data_criteria(data_criteria, @patient)
-    assert_equal 1, entries.length
-    assert entries.first.codes['Source of Payment Typology'].include?('6')
-  end
-
-  def test_unique_data_criteria
-    pairs = unique_data_criteria(@measures, false)
-    assert pairs
-    assert pairs.any? do |p|
-      p['data_criteria_oid'] == "2.16.840.1.113883.3.560.1.8" &&
-      p['value_set_oid'] == "2.16.840.1.113883.3.464.0001.373"
-    end
-  end
-
-  def test_handling_expired_patients
-    data_criteria = OpenStruct.new(definition: "patient_characteristic_expired", status: "", negation: false)
-    deathdate = Time.now.to_i
-    patient = OpenStruct.new(expired: true, deathdate: deathdate)
-    entries = entries_for_data_criteria(data_criteria, patient)
-    assert_equal 1, entries.length
-    assert_equal deathdate, entries.first.start_time
-  end
-
-  def test_measure_section_export
-    measure_entries = @doc.xpath('//cda:section[cda:templateId/@root="2.16.840.1.113883.10.20.24.2.3"]/cda:entry')
-    assert_equal @measures.length, measure_entries.size
-    measure = measure_entries.find do |measure_entry|
-      measure_entry.at_xpath('./cda:organizer/cda:reference/cda:externalDocument/cda:id[@extension="0001"]').present?
-    end
-    assert measure
-  end
-
-  def test_reporting_parameters_section_export
-    effective_time = @doc.at_xpath('//cda:section[cda:templateId/@root="2.16.840.1.113883.10.20.17.2.1"]/cda:entry/cda:act/cda:effectiveTime')
-    assert effective_time
-
-    assert_equal @start_date.to_formatted_s(:number), effective_time.at_xpath('./cda:low')['value']
-    assert_equal @end_date.to_formatted_s(:number), effective_time.at_xpath('./cda:high')['value']
-  end
-
-  def test_record_target_export
-    street_address = @doc.at_xpath('//cda:recordTarget/cda:patientRole/cda:addr/cda:streetAddressLine')
-    assert street_address
-
-    expected_addr = "15 Credibility Street"
-
-    assert_equal expected_addr, street_address.children.first.to_s
   end
 
   def generate_header
