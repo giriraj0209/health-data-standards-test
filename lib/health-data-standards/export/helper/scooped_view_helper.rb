@@ -98,12 +98,10 @@ module HealthDataStandards
           data_criteria_oid = HQMFTemplateHelper.template_id_by_definition_and_status(data_criteria.definition,
                                                                                       data_criteria.status || '',
                                                                                        data_criteria.negation)
-          puts "1 data_criteria_oid: #{data_criteria_oid}"
           is_hqmfr2 = true unless data_criteria_oid
           data_criteria_oid ||= HQMFTemplateHelper.template_id_by_definition_and_status(data_criteria.definition,
                                                                                       data_criteria.status || '',
                                                                                       data_criteria.negation, "r2")
-          puts "2 data_criteria_oid: #{data_criteria_oid}"
           HealthDataStandards.logger.debug("Looking for dc [#{data_criteria_oid}]")
           filtered_entries = []
           entries = []
@@ -139,9 +137,7 @@ module HealthDataStandards
               end
             end
 
-            puts "3 codes: #{codes}"
             codes ||= (value_set_map(patient["bundle_id"])[data_criteria.code_list_id] || [])
-            puts "4 codes: #{codes}"
             if codes.empty?
               HealthDataStandards.logger.warn("No codes for #{data_criteria.code_list_id}")
             end
