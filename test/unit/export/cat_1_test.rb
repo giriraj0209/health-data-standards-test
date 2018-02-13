@@ -40,7 +40,6 @@ class Cat1Test < Minitest::Test
     puts "-------------"
     puts data_criteria.inspect
     puts "-------------"
-    puts "patient['bundle_id']: #{@patient['bundle_id']}"
     entries = entries_for_data_criteria(data_criteria, @patient)
     assert_equal 1, entries.length
     puts entries.inspect
