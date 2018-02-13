@@ -10,7 +10,7 @@ env:
 
 script:
   - bundle exec bundle-audit check --update
-  - bundle exec rake test
+  - bundle exec rake test TEST=test/unit/export/cat_1_test.rb
 
 notifications:
   email:
