@@ -138,7 +138,9 @@ module HealthDataStandards
             end
 
             puts "patient['bundle_id']: #{patient['bundle_id']}"
+            puts "codes: #{codes}"
             codes ||= (value_set_map(patient["bundle_id"])[data_criteria.code_list_id] || [])
+            puts "codes: #{codes}"
             if codes.empty?
               HealthDataStandards.logger.warn("No codes for #{data_criteria.code_list_id}")
             end
