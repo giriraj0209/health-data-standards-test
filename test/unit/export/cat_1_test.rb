@@ -38,12 +38,12 @@ class Cat1Test < Minitest::Test
     assert measure1
     data_criteria = measure1.all_data_criteria.find{|dc| dc.id == 'MedicationDispensedPreferredAsthmaTherapy_precondition_37'}
     puts "-------------"
-    puts data_criteria.inspect
+    ValueSet.all().map do |p|
+      puts p.bundle_id
+    end
     puts "-------------"
     entries = entries_for_data_criteria(data_criteria, @patient)
     assert_equal 1, entries.length
-    puts entries.inspect
-    puts "-------------"
     assert_equal 'Multivitamin', entries[0].description
   end
 

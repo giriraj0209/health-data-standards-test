@@ -8,18 +8,13 @@ module HealthDataStandards
 
         def value_set_map(bundle_id=nil)
           bundle_id_to_use = nil
-          puts "========"
           if bundle_id
             bundle_id_to_use = bundle_id
           else
             latest_bundle_id = HealthDataStandards::CQM::Bundle.latest_bundle_id
-            puts "latest_bundle_id: #{latest_bundle_id}"
             bundle_id_to_use = BSON::ObjectId.from_string(latest_bundle_id) if latest_bundle_id
           end
-          puts "bundle_id_to_use: #{bundle_id_to_use}"
           VS_MAP[bundle_id_to_use] ||= Hash[ValueSet.where({bundle_id: bundle_id_to_use}).map{ |p| [p.oid, p.code_set_map] }]
-          puts VS_MAP
-          VS_MAP[bundle_id_to_use]
         end
 
         # Given a set of measures, find the data criteria/value set pairs that are unique across all of them
@@ -142,10 +137,7 @@ module HealthDataStandards
               end
             end
 
-            puts "patient['bundle_id']: #{patient['bundle_id']}"
-            puts "codes: #{codes}"
             codes ||= (value_set_map(patient["bundle_id"])[data_criteria.code_list_id] || [])
-            puts "codes: #{codes}"
             if codes.empty?
               HealthDataStandards.logger.warn("No codes for #{data_criteria.code_list_id}")
             end
