@@ -40,7 +40,8 @@ module HealthDataStandards
           medication.vehicle = extract_code(entry_element, @vehicle_xpath, 'SNOMED-CT')
 
           medication.allowed_administrations = extract_scalar(entry_element, "./cda:repeatNumber")
-
+          puts medication.allowed_administrations.to_s
+          
           extract_order_information(entry_element, medication)
 
           extract_fulfillment_history(entry_element, medication)
