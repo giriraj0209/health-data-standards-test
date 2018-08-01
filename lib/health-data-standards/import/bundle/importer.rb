@@ -58,7 +58,7 @@ module HealthDataStandards
             unpack_and_store_valuesets(zip_file, bundle)
             measure_ids = unpack_and_store_measures(zip_file, options[:type], bundle, options[:update_measures])
             unpack_and_store_qdm_patients(zip_file, options[:type], bundle) unless options[:exclude_results]
-            unpack_and_store_results(zip_file, options[:type], measure_ids, bundle) unless options[:exclude_results]
+            #unpack_and_store_results(zip_file, options[:type], measure_ids, bundle) unless options[:exclude_results]
 
           end
 
