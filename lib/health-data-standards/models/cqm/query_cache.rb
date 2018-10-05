@@ -51,8 +51,9 @@ module HealthDataStandards
       def is_cv?
         population_ids.has_key?('MSRPOPL')
       end
-
-
+      def self.testme(quote)
+        puts "I am in test me with #{quote}"
+      end
     end
   end
 end
