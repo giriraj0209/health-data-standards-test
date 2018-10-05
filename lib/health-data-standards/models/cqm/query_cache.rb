@@ -30,10 +30,16 @@ module HealthDataStandards
           query_hash.merge!(filters)
         end
         cache_entries = self.where(query_hash)
+        puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cache entries>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        puts cache_entries.to_yaml
+        puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cache entries end>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         aggregate_count = AggregateCount.new(measure_id)
         cache_entries.each do |cache_entry|
           aggregate_count.add_entry(cache_entry)
         end
+        puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<aggragate count>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        puts aggregate_count
+        puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<aggragate count end>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         aggregate_count
       end
 
