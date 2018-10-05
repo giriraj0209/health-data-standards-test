@@ -24,7 +24,9 @@ module HealthDataStandards
       field :supplemental_data, type: Hash
 
       def self.aggregate_measure(measure_id, effective_date, filters=nil, test_id=nil)
+        HealthDataStandards.logger.info "This is from logger info outside"
         begin
+        HealthDataStandards.logger.info "This is from logger info inside"  
         puts "in query cache aggragate measure"
         query_hash = {'effective_date' => effective_date, 'measure_id' => measure_id,
                       'test_id' => test_id}
@@ -58,6 +60,7 @@ module HealthDataStandards
         population_ids.has_key?('MSRPOPL')
       end
       def self.testme(quote)
+        HealthDataStandards.logger.info "I am in test logger"
         puts "I am in test me with #{quote}"
       end
     end
