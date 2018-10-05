@@ -24,6 +24,7 @@ module HealthDataStandards
       field :supplemental_data, type: Hash
 
       def self.aggregate_measure(measure_id, effective_date, filters=nil, test_id=nil)
+        puts "in query cache aggragate measure"
         query_hash = {'effective_date' => effective_date, 'measure_id' => measure_id,
                       'test_id' => test_id}
         if filters
