@@ -14,6 +14,10 @@ module HealthDataStandards
         results = {}
         HealthDataStandards::CQM::QueryCache.testme("im coming")
         measures.each do |measure|
+          puts measure['hqmf_id']
+          puts effective_date
+          puts filter
+          puts test_id
           results[measure['hqmf_id']] = HealthDataStandards::CQM::QueryCache.aggregate_measure(measure['hqmf_id'], effective_date, filter, test_id)
         end
         puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<RESULTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
