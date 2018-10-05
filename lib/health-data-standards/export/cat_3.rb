@@ -13,6 +13,7 @@ module HealthDataStandards
       def export(measures, header, effective_date, start_date, end_date, qrda3_version=nil, filter=nil,test_id=nil)
         results = {}
         HealthDataStandards::CQM::QueryCache.testme("im coming")
+        tst = HealthDataStandards::CQM::QueryCache.aggregate_measure("40280382-5971-4EED-015A-5C465A344DED",effective_date,filter,test_id)
         measures.each do |measure|
           puts measure['hqmf_id']
           puts effective_date
