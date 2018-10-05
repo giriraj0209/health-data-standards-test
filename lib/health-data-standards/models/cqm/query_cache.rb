@@ -24,10 +24,10 @@ module HealthDataStandards
       field :supplemental_data, type: Hash
 
       def self.aggregate_measure(measure_id, effective_date, filters=nil, test_id=nil)
-        HealthDataStandards.logger.info "This is from logger info outside"
+        HealthDataStandards.logger.warn("This is from logger info outside")
         begin
-        HealthDataStandards.logger.info "This is from logger info inside"  
-        puts "in query cache aggragate measure"
+        HealthDataStandards.logger.warn("This is from logger info inside")  
+        HealthDataStandards.logger.warn("in query cache aggragate measure")
         query_hash = {'effective_date' => effective_date, 'measure_id' => measure_id,
                       'test_id' => test_id}
         if filters
@@ -35,9 +35,9 @@ module HealthDataStandards
         end
         cache_entries = self.where(query_hash)
         
-        puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cache entries>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-        puts cache_entries
-        puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cache entries end>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        #puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cache entries>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        #puts cache_entries
+        #puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<cache entries end>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         aggregate_count = AggregateCount.new(measure_id)
         cache_entries.each do |cache_entry|
           aggregate_count.add_entry(cache_entry)
@@ -60,7 +60,7 @@ module HealthDataStandards
         population_ids.has_key?('MSRPOPL')
       end
       def self.testme(quote)
-        HealthDataStandards.logger.info "I am in test logger"
+        HealthDataStandards.logger.warn("I am in test logger")
         puts "I am in test me with #{quote}"
       end
     end
