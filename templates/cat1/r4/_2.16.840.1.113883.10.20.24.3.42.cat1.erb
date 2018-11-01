@@ -1,4 +1,5 @@
 <entry>
+  <% puts entry %>
   <act classCode="ACT" moodCode="EVN" <%== negation_indicator(entry) %>>
     <!-- Medication, Administered template -->
     <templateId root="2.16.840.1.113883.10.20.24.3.42" extension="2016-02-01"/>
@@ -20,7 +21,7 @@
           <low <%= value_or_null_flavor(entry.start_time) %>/>
           <high <%= value_or_null_flavor(entry.end_time) %>/>
         </effectiveTime>
-        <%== render(:partial => 'medication_details', :locals => {:entry => entry, :route_oids=>field_oids["ROUTE"]}) %>
+        <!--render(:partial => 'medication_details', :locals => {:entry => entry, :route_oids=>field_oids["ROUTE"]}) -->
         <consumable>
           <manufacturedProduct classCode="MANU">
             <!-- Medication Information (consolidation) template -->
@@ -33,6 +34,6 @@
         </consumable>
       </substanceAdministration>
     </entryRelationship>
-    <%== render(:partial => 'reason', :locals => {:entry => entry,:reason_oids=>field_oids["REASON"]}) %>
+    <!-- render(:partial => 'reason', :locals => {:entry => entry,:reason_oids=>field_oids["REASON"]})  -->
   </act>
 </entry>
